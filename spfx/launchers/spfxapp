@@ -1,0 +1,7 @@
+#!/bin/bash
+
+source ~/Documents/spfxvenv/bin/activate
+
+cd ~/Documents/spfx
+
+streamlit run SPFX-app.py
