@@ -1,6 +1,7 @@
 # -Spatial-Fix-
 3rd Year Project
 A comparison of two ensemble algorithms on a forecast of the Welsh population:
+
         ◦ Trained on subnational populations figures of Australia, The Netherlands, Sweden and Denmark ranging from 1942-2024
             ▪ Used imputation to handle missing values
         ◦ Evaluated using RMSE, MAE, MAPE, R2 and Computation Time.
