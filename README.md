@@ -1,5 +1,4 @@
 # SPFX
-3rd Year Project
 A comparison of two ensemble algorithms on a forecast of the Welsh population:
 
         ◦ Trained on subnational populations figures of Australia, The Netherlands, Sweden and Denmark ranging from 1942-2024
