@@ -37,21 +37,40 @@ class backend:
 
         return models
 
-streamlit.title('SPFX-Web')
+streamlit.title('Subnational Population Forecast of Wales SPFX')
 
 tab1, tab2, tab3 = streamlit.tabs(['Home', 'Partial Forecast', 'Full Forecast'])
 
 
 with tab1:
     default_data = backend.wales_data()
-
+	
+    select_data = streamlit.segmented_control(
+        label='Select Data', 
+        options=['Default', 'Custom'], 
+        selection_mode='single', 
+        default='Default'
+    )
+    
+    final_data_choice = ...
+    
+    if select_data == 'Default':
+        final_data_choice = backend.wales_data()
+    else:
+        custom_data = streamlit.file_uploader(
+        label='Upload File',
+        type=['csv', 'xlsx']
+        )
+        
+        final_data_choice = custom_data
+        
     streamlit.subheader('Testing Data', divider=True)
-    streamlit.dataframe(default_data)
+    streamlit.dataframe(final_data_choice)
+    
+    column = streamlit.selectbox(label='Pick local authority', options=final_data_choice.columns)
 
-    column = streamlit.selectbox(label='Pick local authority', options=default_data.columns)
-
-    if column:
-        streamlit.bar_chart(default_data[f'{column}'])
+if column:
+    streamlit.bar_chart(final_data_choice[f'{column}'])
 
     ############ Training Data 
     streamlit.subheader('Training Data', divider=True)
@@ -77,7 +96,7 @@ with tab2:
     set_lags = streamlit.number_input(label='set number of lags', min_value=1, max_value=20, value=1)
     set_steps = streamlit.number_input(label='set number of predictions', min_value=1, max_value=20, value=10)
 
-    counties = streamlit.selectbox(label='pick a local authority', options=default_data.columns)
+    counties = streamlit.selectbox(label='pick a local authority', options=final_data_choice.columns)
 
     if set_lags and set_steps:
         models = backend.ensembles()
@@ -103,11 +122,11 @@ with tab2:
     chosen_model = streamlit.selectbox(label='choose model', options=models_list.keys())
     
     if streamlit.button(label='fit and predict') and counties and chosen_model:
-        models_list[chosen_model].fit(default_data[counties])
+        models_list[chosen_model].fit(final_data_choice[counties])
         new_forecast = models_list[chosen_model].predict()
         
         fig, ax = plt.subplots()
-        ax.plot(default_data[f'{counties}'])
+        ax.plot(final_data_choice[f'{counties}'])
         ax.plot(new_forecast)
         
         streamlit.pyplot(fig)
@@ -122,8 +141,8 @@ with tab3:
         }
         
         for model_name, model in models_list.items():
-            for column in default_data.columns:
-                model.fit(default_data[column])
+            for column in final_data_choice.columns:
+                model.fit(final_data_choice[column])
                 forecasts[model_name][column] = model.predict()
         
         return forecasts
@@ -139,7 +158,7 @@ with tab3:
 
     if counties:
         fig, ax = plt.subplots(1,2, figsize=(15,12))
-        ff_selectbox = streamlit.selectbox(label='Select Region', options=default_data.columns)
+        ff_selectbox = streamlit.selectbox(label='Select Region', options=final_data_choice.columns)
 
         if ff_selectbox:
             ax[0].plot(full_forecasts['Stacking Ensemble'][ff_selectbox])
